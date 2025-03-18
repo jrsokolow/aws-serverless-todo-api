@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.myorg</groupId>
-    <artifactId>aws_serverless_todo_api</artifactId>
+    <artifactId>todo-api-lambda</artifactId>
     <version>0.1</version>
 
     <properties>
@@ -30,14 +30,14 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>com.myorg.AwsServerlessTodoApiApp</mainClass>
+                    <mainClass>com.myorg.TodoCdkApp</mainClass>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
     <dependencies>
-        <!-- AWS Cloud Development Kit -->
+        <!-- AWS Cloud Development Kit (All service modules are in aws-cdk-lib in v2) -->
         <dependency>
             <groupId>software.amazon.awscdk</groupId>
             <artifactId>aws-cdk-lib</artifactId>
@@ -55,6 +55,12 @@
           <artifactId>junit-jupiter</artifactId>
           <version>${junit.version}</version>
           <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-core</artifactId>
+            <version>1.2.1</version>
         </dependency>
     </dependencies>
 </project>
