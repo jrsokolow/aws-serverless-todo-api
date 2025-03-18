@@ -54,11 +54,6 @@ public class TodoHandler implements RequestHandler<Map<String, Object>, ApiRespo
 
     // Sample implementations (to be fleshed out with actual DynamoDB logic)
     private ApiResponse handleGet(Context context) {
-        // Create a DynamoDB client and instantiate a DynamoDB object.
-        AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
-        DynamoDB dynamoDB = new DynamoDB(client);
-        Table table = dynamoDB.getTable(TABLE_NAME);
-
         List<Map<String, Object>> itemsAsMap = new ArrayList<>();
         try {
             // Scan the table for all items.
