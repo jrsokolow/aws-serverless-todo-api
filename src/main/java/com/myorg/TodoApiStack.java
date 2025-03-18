@@ -1,6 +1,7 @@
 package com.myorg;
 
 import software.amazon.awscdk.App;
+import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.dynamodb.Attribute;
@@ -35,6 +36,7 @@ public class TodoApiStack extends Stack {
                                 .runtime(Runtime.JAVA_17)
                                 .handler("com.myorg.TodoHandler::handleRequest")
                                 .code(Code.fromAsset("target/todo-api-lambda-0.1.jar")) // Path to your built Lambda jar
+                                .timeout(Duration.seconds(10))
                                 .build();
 
                 // Grant the Lambda function read/write permissions on the DynamoDB table.

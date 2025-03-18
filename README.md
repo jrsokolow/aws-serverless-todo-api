@@ -14,5 +14,6 @@ It is a [Maven](https://maven.apache.org/) based project, so you can open this p
  * `cdk deploy`      deploy this stack to your default AWS account/region
  * `cdk diff`        compare deployed stack with current state
  * `cdk docs`        open CDK documentation
+ * `aws logs tail /aws/lambda/TodoApiStack-TodoLambda8D7FA7F9-3wUSwMSwPV4T --follow`
 
 Enjoy!

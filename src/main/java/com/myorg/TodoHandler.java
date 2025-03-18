@@ -20,6 +20,11 @@ public class TodoHandler implements RequestHandler<Map<String, Object>, ApiRespo
 
     private static final String TABLE_NAME = "TodoTable";
 
+    // Create a DynamoDB client and instantiate a DynamoDB object.
+    private static final AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
+    private static final DynamoDB dynamoDB = new DynamoDB(client);
+    private static final Table table = dynamoDB.getTable(TABLE_NAME);
+
     @Override
     public ApiResponse handleRequest(Map<String, Object> input, Context context) {
         // Log the received event (you can see it in CloudWatch logs).
@@ -35,7 +40,7 @@ public class TodoHandler implements RequestHandler<Map<String, Object>, ApiRespo
                 return handleGet(context);
             case "POST":
                 // Create a new TODO.
-                return handlePost(input);
+                return handlePost(context, input);
             case "PUT":
                 // Update an existing TODO.
                 return handlePut(input);
@@ -54,25 +59,25 @@ public class TodoHandler implements RequestHandler<Map<String, Object>, ApiRespo
         DynamoDB dynamoDB = new DynamoDB(client);
         Table table = dynamoDB.getTable(TABLE_NAME);
 
-        ScanSpec scanSpec = new ScanSpec();
-        List<Item> items = new ArrayList<>();
-
+        List<Map<String, Object>> itemsAsMap = new ArrayList<>();
         try {
             // Scan the table for all items.
+            ScanSpec scanSpec = new ScanSpec();
             ItemCollection<ScanOutcome> itemsCollection = table.scan(scanSpec);
+
             for (Item item : itemsCollection) {
-                items.add(item);
+                itemsAsMap.add(item.asMap());
             }
         } catch (Exception e) {
             context.getLogger().log("Failed to scan table: " + e.getMessage());
             return new ApiResponse(500, "Failed to fetch items: " + e.getMessage());
         }
 
-        // Convert the list of items to JSON.
+        // Convert the list of item maps to JSON.
         ObjectMapper mapper = new ObjectMapper();
         String jsonResponse;
         try {
-            jsonResponse = mapper.writeValueAsString(items);
+            jsonResponse = mapper.writeValueAsString(itemsAsMap);
         } catch (Exception e) {
             context.getLogger().log("Failed to convert items to JSON: " + e.getMessage());
             return new ApiResponse(500, "Error converting items to JSON: " + e.getMessage());
@@ -80,7 +85,7 @@ public class TodoHandler implements RequestHandler<Map<String, Object>, ApiRespo
         return new ApiResponse(200, jsonResponse);
     }
 
-    private ApiResponse handlePost(Map<String, Object> input) {
+    private ApiResponse handlePost(Context context, Map<String, Object> input) {
         // Extract the body from the input event
         String body = (String) input.get("body");
         if (body == null || body.isEmpty()) {
@@ -105,11 +110,6 @@ public class TodoHandler implements RequestHandler<Map<String, Object>, ApiRespo
 
         // Generate a unique ID for the new TODO item
         String id = java.util.UUID.randomUUID().toString();
-
-        // Create a DynamoDB client and reference the table
-        AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
-        DynamoDB dynamoDB = new DynamoDB(client);
-        Table table = dynamoDB.getTable(TABLE_NAME);
 
         try {
             // Build the new item and insert it into the table
